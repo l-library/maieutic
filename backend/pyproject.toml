@@ -1,0 +1,14 @@
+[project]
+name = "maieutic-backend"
+version = "0.1.0"
+description = "The backend of maieutic"
+requires-python = ">=3.12"
+
+dependencies = [
+    # Web 框架
+    "fastapi>=0.141.1",
+    "uvicorn[standard]>=0.53.0",
+
+    # LLM
+    "openai>=3.17.0",
+]
