@@ -5,6 +5,7 @@
 from pathlib import Path
 from functools import lru_cache
 import platform
+from app.agent.tools import get_tool_inf
 
 PROMPT_DIR = Path(__file__).resolve().parent
 
@@ -61,10 +62,5 @@ class Prompt:
 - 输出 <action> 后立即停止生成，等待真实的 <observation>，擅自生成 <observation> 将导致错误
 
 ## tools
-- ask_question(question) 向用户问问题，用户的回复将作为下一步的输入 示例：<action>ask_question("如何称呼你")</action>
-- web_search(question) 通过搜索引擎查询，用户的回复将作为下一步的输入 示例：<action>web_search("埃菲尔铁塔有多高")</action>
-- web_extract(urls) 解析 urls ，返回网页的原始内容，可以输入多个 示例： <action>web_extract(["https://github.com","https://baidu.com"]</action>
-
-
             """
-        return sys + soul
+        return sys + soul + get_tool_inf()

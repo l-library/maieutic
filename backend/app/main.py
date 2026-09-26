@@ -1,20 +1,12 @@
-import asyncio
 from fastapi import FastAPI
-from app.agent.agent import agent
+from app.api.v1.router import api_router as v1_router
 
 app = FastAPI()
-_agent = agent()
+
+
+app.include_router(v1_router, prefix="/api/v1")
 
 
 @app.get("/")
 def check_health():
     return {"status": "ok", "message": "Maieutic 服务已就绪"}
-
-
-@app.get("/chat/")
-def chat():
-    return {
-        "return": asyncio.run(
-            _agent.core_loop(user_message="测试：请尝试通过网络搜索2026世界杯")
-        )
-    }
