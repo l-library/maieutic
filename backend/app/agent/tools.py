@@ -36,33 +36,29 @@ def get_tool_inf() -> str:
 
 
 @tool
-def ask_question(qustion: str):
+def ask_question(question: str):
     """
     简介：向用户问问题，用户的回复将作为下一步的输入
     示例：<action>ask_question("如何称呼你")</action>
     """
-    raise (Interrupt(kind="ask_user", payload=qustion))
+    raise (Interrupt(kind="ask_user", payload=question))
 
 
 @tool
-def web_search(qustion: str):
+def web_search(question: str) -> str:
     """
     简介：通过搜索引擎搜索，用户的回复将作为下一步的输入
     示例：<action>web_search("埃菲尔铁塔有多高")</action>
     """
-    response = _tavily_client.search(qustion)
-    return response
+    response = _tavily_client.search(question)
+    return str(response)
 
 
 @tool
-def web_extract(urls: list):
+def web_extract(urls: list) -> str:
     """
     简介：解析 urls ，返回网页的原始内容，可以输入多个
-    示例： <action>web_extract(["https://github.com","https://baidu.com"]</action>
+    示例： <action>web_extract(["https://github.com","https://baidu.com"])</action>
     """
     response = _tavily_client.extract(urls=urls, include_images=False)
     return response["results"]
-
-
-if __name__ == "__main__":
-    print(REGISTER["web_extract"].__doc__)
