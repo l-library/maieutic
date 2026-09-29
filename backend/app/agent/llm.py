@@ -1,13 +1,14 @@
 """
-大模型相关
+基础 LLM 调用
 """
 
 import os
 from openai import OpenAI, AsyncOpenAI
 from dotenv import load_dotenv
 import asyncio
-
+from app.agent.tools import get_tool_list
 from openai.types.chat import ChatCompletionMessageParam
+
 
 # 读取配置文件
 load_dotenv()
@@ -52,6 +53,8 @@ def generate(prompt: str, timeout: float = 60, max_tokens: int = 1000):
         extra_body={"thinking": {"type": "enabled"}},
         max_tokens=max_tokens,
         timeout=timeout,
+        tools=get_tool_list(),
+        tool_choice="auto",
     )
     content = getattr(response.choices[0].message, "content", None)
     reasoning_content = getattr(response.choices[0].message, "reasoning_content", None)
@@ -77,13 +80,11 @@ async def generate_stream(
         extra_body={"thinking": {"type": "enabled"}},
         max_tokens=max_tokens,
         timeout=timeout,
+        tools=get_tool_list(),
+        tool_choice="auto",
     )
     async for chunk in response:
-        if not chunk.choices:
-            continue
-        delta = chunk.choices[0].delta
-        if delta.content:
-            yield delta.content
+        yield chunk
 
 
 async def main():

@@ -6,6 +6,7 @@ from os import getenv
 from typing import Callable
 from tavily import TavilyClient
 from dotenv import load_dotenv
+from openai import BaseModel, pydantic_function_tool
 
 load_dotenv()
 
@@ -19,46 +20,78 @@ class Interrupt(Exception):
         self.kind, self.payload = kind, payload
 
 
+CLASS_REGISTER: dict[str, type[BaseModel]] = {}
 REGISTER: dict[str, Callable] = {}
 
 
 # tool 注册器
-def tool(fn: Callable):
+def tool(cl: type[BaseModel]):  # 表示类本身而非实例
+    CLASS_REGISTER[cl.__name__] = cl
+    return cl
+
+
+# fun 注册器
+def fun(fn: Callable):
     REGISTER[fn.__name__] = fn
     return fn
 
 
-def get_tool_inf() -> str:
-    inf: str = ""
-    for i, j in REGISTER.items():
-        inf += f"\n---\n{i}\n{j.__doc__}\n---"
-    return inf
+# 定义数据模型描述工具参数
+@tool
+class Ask_Question(BaseModel):
+    """
+    向用户问问题
+    """
+
+    question: str
 
 
 @tool
+class Web_Search(BaseModel):
+    """
+    通过搜索引擎搜索
+    """
+
+    question: str
+
+
+@tool
+class Web_Extract(BaseModel):
+    """
+    解析 urls ，返回网页的原始内容，可以输入多个
+    """
+
+    urls: list[str]
+
+
+def get_tool_list():
+    """
+    获取 openai 格式工具列表
+    """
+    return [pydantic_function_tool(m) for m in CLASS_REGISTER.values()]
+
+
+@fun
 def ask_question(question: str):
     """
-    简介：向用户问问题，用户的回复将作为下一步的输入
-    示例：<action>ask_question("如何称呼你")</action>
+    向用户问问题，用户的回复将作为下一步的输入
     """
     raise (Interrupt(kind="ask_user", payload=question))
 
 
-@tool
+@fun
 def web_search(question: str) -> str:
     """
-    简介：通过搜索引擎搜索，用户的回复将作为下一步的输入
-    示例：<action>web_search("埃菲尔铁塔有多高")</action>
+    通过搜索引擎搜索，用户的回复将作为下一步的输入
     """
     response = _tavily_client.search(question)
     return str(response)
 
 
-@tool
+@fun
 def web_extract(urls: list) -> str:
     """
-    简介：解析 urls ，返回网页的原始内容，可以输入多个
-    示例： <action>web_extract(["https://github.com","https://baidu.com"])</action>
+    解析 urls ，返回网页的原始内容，可以输入多个
     """
     response = _tavily_client.extract(urls=urls, include_images=False)
     return response["results"]
