@@ -11,7 +11,7 @@ from app.agent.agent import agent
 router = APIRouter()
 
 
-_conversations: dict[int, agent] = {}
+_conversations: dict[str, agent] = {}
 
 
 class Message(BaseModel):
@@ -33,7 +33,7 @@ def llm_alive():
     response_model=ModelResponse,
     response_class=EventSourceResponse,
 )
-async def llm_chat(conversation_id: int, message: Message):
+async def llm_chat(conversation_id: str, message: Message):
     try:
         _agent = _conversations[conversation_id]
     except KeyError:
