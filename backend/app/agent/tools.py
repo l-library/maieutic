@@ -10,7 +10,14 @@ from openai import BaseModel, pydantic_function_tool
 
 load_dotenv()
 
-_tavily_client = TavilyClient(api_key=getenv("TAVILY_API_KEY"))
+_tavily_client = None
+
+
+def _get_tavily_client():
+    global _tavily_client
+    if _tavily_client is None:
+        _tavily_client = TavilyClient(api_key=getenv("TAVILY_API_KEY"))
+    return _tavily_client
 
 
 class Interrupt(Exception):
@@ -84,7 +91,7 @@ def web_search(question: str) -> str:
     """
     通过搜索引擎搜索，用户的回复将作为下一步的输入
     """
-    response = _tavily_client.search(question)
+    response = _get_tavily_client().search(question)
     return str(response)
 
 
@@ -93,5 +100,5 @@ def web_extract(urls: list) -> str:
     """
     解析 urls ，返回网页的原始内容，可以输入多个
     """
-    response = _tavily_client.extract(urls=urls, include_images=False)
+    response = _get_tavily_client().extract(urls=urls, include_images=False)
     return response["results"]
