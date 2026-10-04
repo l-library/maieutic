@@ -4,22 +4,26 @@ Agent 主循环
 
 from loguru import logger
 from openai.types.chat import ChatCompletionMessageParam
-from tavily.utils import json
+import json
 from app.agent.prompt import Prompt
-from app.agent import llm
+from app.agent.llm import LLMClient
 from app.agent import tools
+from typing import AsyncGenerator, Dict, Any
 
 
 class agent:
-    def __init__(self) -> None:
+    def __init__(self, _llm: LLMClient) -> None:
         self.prompt = Prompt()
         self.messages: list[ChatCompletionMessageParam] = [
             {"role": "system", "content": self.prompt.get_sys_prompt()}
         ]
         self.pending = None
         self.tool_call_id = ""
+        self.llm = _llm
 
-    async def core_loop(self, user_message: str, max_loop: int = 10):
+    async def core_loop(
+        self, user_message: str, max_loop: int = 10
+    ) -> AsyncGenerator[Dict[str, Any], None]:
         """
         agent 核心循环
         """
@@ -47,7 +51,7 @@ class agent:
             tool_calls_acc = {}  # key: index value: {"id","name","arguments"}
             content_parts = []
             # 调用 LLM 获取 chunk
-            async for chunk in llm.generate_stream(self.messages):
+            async for chunk in self.llm.generate_stream(self.messages):
                 if not chunk.choices:
                     continue
                 choice = chunk.choices[0]
