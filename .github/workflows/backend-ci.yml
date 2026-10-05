@@ -7,6 +7,10 @@ on:
   pull_request:
     paths: ["backend/**"]
 
+defaults:
+  run:
+    working-directory: backend
+
 jobs:
   backend:
     name: Backend lint and test
