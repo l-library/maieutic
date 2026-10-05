@@ -128,14 +128,15 @@ class agent:
                         self.pending = iv
                         self.tool_call_id = slot["id"]
                         flag = False
-                    except BaseException as e:
+                    except Exception as e:  # noqa: BLE001
                         self.messages.append(
                             {
                                 "role": "tool",
-                                "content": f"Error: {str(e)}",
+                                "content": f"Error: {e!s}",
                                 "tool_call_id": slot["id"],
                             }
                         )
+                        logger.info(f"TOOL_CALL_ERROR: {e!s}")
             else:
                 self.messages.append(new_message)
                 flag = False

@@ -1,4 +1,10 @@
-name: CI
+name: Backend CI
+
+env:
+  LLM_MODEL_NAME: deepseek-v4-flash
+  LLM_BASE_URL: https://api.deepseek.com
+  LLM_API_KEY: sk-...
+  TAVILY_API_KEY: tvly-...
 
 on:
   push:
@@ -23,7 +29,8 @@ jobs:
         uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
-          cache-dependency-glob: "pyproject.toml"
+          working-directory: backend
+          cache-dependency-glob: uv.lock
       - name: Install project
         run: uv sync --frozen
       - name: Ruff lint
