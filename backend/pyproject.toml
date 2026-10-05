@@ -14,3 +14,10 @@ dependencies = [
     "loguru>=0.7.3",
     "pytest-asyncio>=1.4.0",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+addopts = "-m 'not integration'"
+markers = [
+    "integration: 需要真实网络与 API key 的冒烟测试，仅在 -m integration 时运行",
+]
