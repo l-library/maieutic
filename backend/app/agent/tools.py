@@ -2,11 +2,12 @@
 提供给 agent 的可调用工具
 """
 
+from collections.abc import Callable
 from os import getenv
-from typing import Callable
-from tavily import TavilyClient
+
 from dotenv import load_dotenv
 from openai import BaseModel, pydantic_function_tool
+from tavily import TavilyClient
 
 load_dotenv()
 

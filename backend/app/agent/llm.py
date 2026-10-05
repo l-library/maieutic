@@ -3,12 +3,14 @@
 """
 
 import os
-from typing import Any, AsyncIterable, Protocol
-from openai import OpenAI, AsyncOpenAI
+from collections.abc import AsyncIterable
+from typing import Any, Protocol
+
 from dotenv import load_dotenv
-from app.agent.tools import get_tool_list
+from openai import AsyncOpenAI, OpenAI
 from openai.types.chat import ChatCompletionChunk, ChatCompletionMessageParam
 
+from app.agent.tools import get_tool_list
 
 # 读取配置文件
 load_dotenv()

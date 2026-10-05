@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+
 from app.api.v1.router import api_router as v1_router
 from app.core.log_setup import setup_log
 

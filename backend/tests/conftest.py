@@ -1,6 +1,8 @@
-import pytest
-import app.agent.tools as tools
 from unittest.mock import MagicMock
+
+import pytest
+
+from app.agent import tools
 
 
 @pytest.fixture

@@ -5,8 +5,9 @@
 from fastapi import APIRouter
 from fastapi.sse import EventSourceResponse
 from openai import BaseModel
-from app.agent.llm import LLM
+
 from app.agent.agent import agent
+from app.agent.llm import LLM
 
 router = APIRouter()
 

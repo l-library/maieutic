@@ -2,15 +2,20 @@
 读取提示词，注入工具提示
 """
 
-from pathlib import Path
-from functools import lru_cache
 import platform
+from functools import lru_cache
+from pathlib import Path
 
 PROMPT_DIR = Path(__file__).resolve().parent
 
 
 class PromptNotFoundError(FileNotFoundError):
     pass
+
+
+@lru_cache
+def _read(path: str, mtime: float) -> str:
+    return Path(path).read_text(encoding="utf-8")
 
 
 class Prompt:
@@ -23,17 +28,13 @@ class Prompt:
             self.os_env = "UNKNOW"
         return self.os_env
 
-    @lru_cache(maxsize=None)
-    def read(self, path: str, mtime: float) -> str:
-        return Path(path).read_text(encoding="utf-8")
-
     def get_sys_prompt(self) -> str:
         path = PROMPT_DIR / "SOUL.md"
         if not path.is_file():
             raise PromptNotFoundError(f"提示词文件不存在: {path}")
         # 获取文件的修改时间，当作参数传给_read
         # 只要不变，_read就会缓存命中，而不读文件；如果没有命中，就说明文件被修改了，自动热重载
-        soul = self.read(str(path), path.stat().st_mtime).strip()
+        soul = _read(str(path), path.stat().st_mtime).strip()
         sys = f"""
 # 工作环境相关信息：
 操作系统：{self.os_env}

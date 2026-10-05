@@ -2,13 +2,19 @@
 Agent 主循环
 """
 
-from loguru import logger
-from openai.types.chat import ChatCompletionMessageParam
 import json
-from app.agent.prompt import Prompt
-from app.agent.llm import LLMClient
+from collections.abc import AsyncGenerator
+from typing import Any
+
+from loguru import logger
+from openai.types.chat import (
+    ChatCompletionAssistantMessageParam,
+    ChatCompletionMessageParam,
+)
+
 from app.agent import tools
-from typing import AsyncGenerator, Dict, Any
+from app.agent.llm import LLMClient
+from app.agent.prompt import Prompt
 
 
 class agent:
@@ -17,13 +23,13 @@ class agent:
         self.messages: list[ChatCompletionMessageParam] = [
             {"role": "system", "content": self.prompt.get_sys_prompt()}
         ]
-        self.pending = None
+        self.pending: tools.Interrupt | None = None
         self.tool_call_id = ""
         self.llm = _llm
 
     async def core_loop(
         self, user_message: str, max_loop: int = 10
-    ) -> AsyncGenerator[Dict[str, Any], None]:
+    ) -> AsyncGenerator[dict[str, Any], None]:
         """
         agent 核心循环
         """
@@ -38,9 +44,7 @@ class agent:
             ]
             self.pending = None
         else:
-            message: list[ChatCompletionMessageParam] = [
-                {"role": "user", "content": user_message}
-            ]
+            message = [{"role": "user", "content": user_message}]
 
         self.messages += message
 
@@ -48,7 +52,9 @@ class agent:
         flag = True
         while (loop < max_loop) and flag:
             loop += 1
-            tool_calls_acc = {}  # key: index value: {"id","name","arguments"}
+            tool_calls_acc: dict[
+                Any, Any
+            ] = {}  # key: index value: {"id","name","arguments"}
             content_parts = []
             # 调用 LLM 获取 chunk
             async for chunk in self.llm.generate_stream(self.messages):
@@ -83,7 +89,7 @@ class agent:
                         if tc.function and tc.function.arguments:
                             acc["arguments"] += tc.function.arguments  # 增量拼接
 
-            new_message: ChatCompletionMessageParam = {
+            new_message: ChatCompletionAssistantMessageParam = {
                 "role": "assistant",
                 "content": "".join(content_parts) or None,
             }
@@ -103,7 +109,7 @@ class agent:
                     for _, slot in sorted(tool_calls_acc.items())
                 ]
                 self.messages.append(new_message)
-                for _, slot in tool_calls_acc.items():  # 取出所有工具调用
+                for slot in tool_calls_acc.values():  # 取出所有工具调用
                     name = slot["name"].lower()
                     args = json.loads(slot["arguments"]) if slot["arguments"] else {}
                     logger.info(f"tool_call: {name}, {args}")
