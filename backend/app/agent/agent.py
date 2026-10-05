@@ -113,7 +113,6 @@ class agent:
                     name = slot["name"].lower()
                     args = json.loads(slot["arguments"]) if slot["arguments"] else {}
                     logger.info(f"tool_call: {name}, {args}")
-                    # TODO: 错误处理
                     try:
                         tool_res = tools.REGISTER[name](**args)
                         logger.info(f"tool_res:{tool_res}")
@@ -129,6 +128,14 @@ class agent:
                         self.pending = iv
                         self.tool_call_id = slot["id"]
                         flag = False
+                    except BaseException as e:
+                        self.messages.append(
+                            {
+                                "role": "tool",
+                                "content": f"Error: {str(e)}",
+                                "tool_call_id": slot["id"],
+                            }
+                        )
             else:
                 self.messages.append(new_message)
                 flag = False
