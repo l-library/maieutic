@@ -1,0 +1,32 @@
+name: frontend-ci
+
+on:
+  push:
+    branches: [main]
+    paths: ["frontend/**"]
+  pull_request:
+    paths: ["frontend/**"]
+
+defaults:
+  run:
+    working-directory: frontend
+
+jobs:
+  frontend:
+    name: frontend lint and build
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+        - name: Setup node.js
+          uses: actions/setup-node@v7
+          with: 
+            node-version: 24
+        - name: Setup environment
+          run: npm install
+        - name: frontend lint
+          run: npm run lint
+        - name: frontend build
+          run: npm run build
+
+    
