@@ -3,8 +3,8 @@ ORM 连接初始化
 """
 
 import os
+from collections.abc import AsyncIterator
 from pathlib import Path
-from typing import AsyncIterator
 
 from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine

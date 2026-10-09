@@ -2,9 +2,9 @@
 conversation 表映射
 """
 
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import JSON, String
 from app.db.base import Base
+from sqlalchemy import JSON, String
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class Conversation(Base):

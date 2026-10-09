@@ -6,15 +6,14 @@ import json
 from collections.abc import AsyncGenerator
 from typing import Any
 
+from app.agent import tools
+from app.agent.llm import LLMClient
+from app.agent.prompt import Prompt
 from loguru import logger
 from openai.types.chat import (
     ChatCompletionAssistantMessageParam,
     ChatCompletionMessageParam,
 )
-
-from app.agent import tools
-from app.agent.llm import LLMClient
-from app.agent.prompt import Prompt
 
 
 class agent:

@@ -1,10 +1,9 @@
 import json
 
 import pytest
-from fake_llm import FakeLLM
-
 from app.agent import tools
 from app.agent.agent import agent
+from fake_llm import FakeLLM
 
 ALLOWED_KEYS = {"type", "content"}
 
