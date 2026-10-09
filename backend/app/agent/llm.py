@@ -6,10 +6,11 @@ import os
 from collections.abc import AsyncIterable
 from typing import Any, Protocol
 
-from app.agent.tools import get_tool_list
 from dotenv import load_dotenv
 from openai import AsyncOpenAI, OpenAI
 from openai.types.chat import ChatCompletionChunk, ChatCompletionMessageParam
+
+from app.agent.tools import get_tool_list
 
 # 读取配置文件
 load_dotenv()

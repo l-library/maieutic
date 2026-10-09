@@ -3,6 +3,7 @@ import os
 from unittest.mock import patch
 
 import pytest
+
 from app.agent import tools
 from app.agent.tools import CLASS_REGISTER, REGISTER, Interrupt
 

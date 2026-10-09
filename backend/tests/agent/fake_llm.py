@@ -2,7 +2,6 @@ import time
 from collections.abc import AsyncIterable
 from typing import Literal
 
-from app.agent.llm import LLMClient
 from openai.types.chat import ChatCompletionChunk, ChatCompletionMessageParam
 from openai.types.chat.chat_completion_chunk import (
     Choice,
@@ -10,6 +9,8 @@ from openai.types.chat.chat_completion_chunk import (
     ChoiceDeltaToolCall,
     ChoiceDeltaToolCallFunction,
 )
+
+from app.agent.llm import LLMClient
 
 FAKE_ID = "chatcmpl-fake-001"
 FAKE_MODEL = "fake-model"
