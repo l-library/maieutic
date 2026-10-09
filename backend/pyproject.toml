@@ -12,6 +12,9 @@ dependencies = [
     "tavily-python>=0.8.4",
     "loguru>=0.7.3",
     "pytest-asyncio>=1.4.0",
+    "sqlalchemy[asyncio]>=2.1.4",
+    "alembic>=1.20.0",
+    "aiosqlite>=0.22.1",
 ]
 
 [tool.pytest.ini_options]

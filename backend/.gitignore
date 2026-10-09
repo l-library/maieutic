@@ -3,3 +3,4 @@
 dist/
 app.log
 *.egg-info
+data/
