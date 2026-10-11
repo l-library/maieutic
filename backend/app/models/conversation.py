@@ -4,6 +4,7 @@ conversation 表映射
 
 from openai.types.chat import ChatCompletionMessageParam
 from sqlalchemy import JSON, String
+from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -17,5 +18,7 @@ class Conversation(Base):
 
     title: Mapped[str] = mapped_column(String(50), doc="对话标题")
     messages: Mapped[list[ChatCompletionMessageParam]] = mapped_column(
-        JSON, default=list, doc="每轮消息，type表示类型，content为消息内容"
+        MutableList.as_mutable(JSON),
+        default=list,
+        doc="每轮消息，type表示类型，content为消息内容",
     )

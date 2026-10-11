@@ -2,18 +2,19 @@
 对话api
 """
 
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.sse import EventSourceResponse
 from openai import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.agent.agent import agent
+from app.agent.agent import core_loop
 from app.agent.llm import LLM
+from app.db.engine import get_db
+from app.services import conversation as conversation_service
 
 router = APIRouter()
-
-
-_conversations: dict[str, agent] = {}
-
 
 _llm_client = None
 
@@ -39,16 +40,47 @@ def llm_alive():
     return {"llm test": _get_llm_client().generate("hello")[0]}
 
 
+@router.get("/conversation/create/{conversation_id}")
+async def get_conversation(
+    conversation_id: int, session: Annotated[AsyncSession, Depends(get_db)]
+):
+    """
+    利用 conversation id 获取对话
+    """
+    conv = await conversation_service.get_conversation(session, conversation_id)
+    if conv is None:
+        raise HTTPException(404, detail="对话不存在")
+    return conv
+
+
 @router.post(
-    "/chat/{conversation_id}",
+    "/conversation/chat/{conversation_id}",
     response_model=ModelResponse,
     response_class=EventSourceResponse,
 )
-async def llm_chat(conversation_id: str, message: Message):
-    try:
-        _agent = _conversations[conversation_id]
-    except KeyError:
-        _agent = agent(_get_llm_client())
-        _conversations[conversation_id] = _agent
-    async for piece in _agent.core_loop(message.message):
+async def llm_chat(
+    conversation_id: int,
+    message: Message,
+    session: Annotated[AsyncSession, Depends(get_db)],
+):
+    """
+    传入对话id，使用那个id的对话历史
+    """
+    conv = await conversation_service.get_conversation(session, conversation_id)
+    async for piece in core_loop(
+        history=conv,
+        user_message=message.message,
+        llm=_get_llm_client(),
+        db_session=session,
+        conversation_id=conversation_id,
+    ):
         yield piece
+
+
+@router.get("/conversation/create")
+async def create_conversation(session: Annotated[AsyncSession, Depends(get_db)]):
+    """
+    创建对话，返回对话id
+    """
+    _id = await conversation_service.create_conversation("test", session)
+    return _id
