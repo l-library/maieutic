@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "maieutic-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
+    "gen:api": "npm exec --prefix tools/openapi -- openapi-typescript src/api/openapi.json -o src/api/types.ts",
     "preview": "vite preview"
   },
   "dependencies": {
