@@ -53,7 +53,7 @@ def test_create_and_get_conversation(client):
     conversation_id = response.json()
     assert isinstance(conversation_id, int)
 
-    response = client.get(f"/api/v1/conversation/create/{conversation_id}")
+    response = client.get(f"/api/v1/conversation/get/{conversation_id}")
     assert response.status_code == 200
     assert response.json() == []
 
@@ -74,7 +74,7 @@ def test_chat_persists_messages(client):
     assert any(e["type"] == "tool_calls" for e in events)
     assert events[-1]["type"] == "assistant"
 
-    response = client.get(f"/api/v1/conversation/create/{conversation_id}")
+    response = client.get(f"/api/v1/conversation/get/{conversation_id}")
     roles = [m["role"] for m in response.json()]
     assert roles == ["user", "assistant", "tool", "assistant"]
 
@@ -88,11 +88,11 @@ def test_conversations_are_isolated(client):
     client.post(f"/api/v1/conversation/chat/{first}", json={"message": "TEST"})
 
     assert [
-        m["role"] for m in client.get(f"/api/v1/conversation/create/{first}").json()
+        m["role"] for m in client.get(f"/api/v1/conversation/get/{first}").json()
     ] == [
         "user",
         "assistant",
         "tool",
         "assistant",
     ]
-    assert client.get(f"/api/v1/conversation/create/{second}").json() == []
+    assert client.get(f"/api/v1/conversation/get/{second}").json() == []

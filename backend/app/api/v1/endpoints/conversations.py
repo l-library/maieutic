@@ -40,7 +40,7 @@ def llm_alive():
     return {"llm test": _get_llm_client().generate("hello")[0]}
 
 
-@router.get("/conversation/{conversation_id}")
+@router.get("/conversation/get/{conversation_id}")
 async def get_conversation(
     conversation_id: int, session: Annotated[AsyncSession, Depends(get_db)]
 ):

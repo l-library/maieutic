@@ -21,7 +21,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/conversation/{conversation_id}": {
+    "/api/v1/conversation/get/{conversation_id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -32,7 +32,7 @@ export interface paths {
          * Get Conversation
          * @description 利用 conversation id 获取对话
          */
-        get: operations["get_conversation_api_v1_conversation__conversation_id__get"];
+        get: operations["get_conversation_api_v1_conversation_get__conversation_id__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -165,7 +165,7 @@ export interface operations {
             };
         };
     };
-    get_conversation_api_v1_conversation__conversation_id__get: {
+    get_conversation_api_v1_conversation_get__conversation_id__get: {
         parameters: {
             query?: never;
             header?: never;
