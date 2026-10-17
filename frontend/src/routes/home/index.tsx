@@ -1,10 +1,11 @@
+import SideBar from '@/components/UI/SideBar'
 
 const Home = () =>{
    return (
        <>
-           <h1>
-               hello, world!
-           </h1>
+           <SideBar/>
+           <body className={"bg-background"}>
+           </body>
        </>
    )
 }

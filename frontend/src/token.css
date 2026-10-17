@@ -1,6 +1,23 @@
-:root{
+@import "tailwindcss";
+
+@theme{
     /*颜色*/
-    --color-primary: #ff8620;
+    /*中性色*/
+    --color-background: var(--color-slate-50);
+    --color-sidebar: var(--color-slate-100);
+    --color-hover: var(--color-slate-200);
+    --color-border: var(--color-slate-200);
+
+    /*主题色*/
+    --color-primary: ;
     --color-secondary: #fea75f;
-    --color-background: #fff0d8;
+    /*TODO: 暗色模式*/
+    /*布局尺寸*/
+    --spacing-sidebar: 16rem;
+    --spacing-bar-offset: calc(var(--spacing-sidebar) + 1rem);
+}
+@layer comment {
+    .menu-item {
+         @apply  flex gap-2 py-2 rounded-2xl items-center hover:bg-hover shadow shadow-border
+     }
 }
