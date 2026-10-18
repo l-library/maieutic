@@ -20,6 +20,19 @@ async def get_conversation(
     return conv.messages
 
 
+async def get_list(session: AsyncSession) -> list[dict]:
+    """查：查询 conversation list"""
+    res: list[dict] = []
+    _id = 1
+    while True:
+        conv = await session.get(Conversation, _id)
+        if not conv:
+            break
+        res.append({"id": _id, "title": conv.title})
+        _id += 1
+    return res
+
+
 async def create_conversation(title: str, session: AsyncSession) -> int:
     """
     增：创建对话，返回对话 id

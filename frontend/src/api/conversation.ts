@@ -13,5 +13,8 @@ export const conversationAPI = {
         client.POST("/api/v1/conversation/chat/{conversation_id}",{body:message,params:{path:{conversation_id}}}),
 
     create_conversation: ()=>
-        client.GET("/api/v1/conversation/create")
+        client.GET("/api/v1/conversation/create"),
+
+    get_list:()=>
+        client.GET("/api/v1/conversation/list")
 }

@@ -7,6 +7,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.sse import EventSourceResponse
 from openai import BaseModel
+from openai.types.chat import ChatCompletionMessageParam
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agent.agent import core_loop
@@ -35,12 +36,20 @@ class ModelResponse(BaseModel):
     content: str
 
 
+class ConversationElement(BaseModel):
+    id: int
+    title: str
+
+
 @router.get("/")
 def llm_alive():
     return {"llm test": _get_llm_client().generate("hello")[0]}
 
 
-@router.get("/conversation/get/{conversation_id}")
+@router.get(
+    "/conversation/get/{conversation_id}",
+    response_model=list[ChatCompletionMessageParam],
+)
 async def get_conversation(
     conversation_id: int, session: Annotated[AsyncSession, Depends(get_db)]
 ):
@@ -84,3 +93,12 @@ async def create_conversation(session: Annotated[AsyncSession, Depends(get_db)])
     """
     _id = await conversation_service.create_conversation("test", session)
     return _id
+
+
+@router.get("/conversation/list", response_model=list[ConversationElement])
+async def get_conversation_list(session: Annotated[AsyncSession, Depends(get_db)]):
+    """
+    获取对话清单
+    """
+    _list = await conversation_service.get_list(session)
+    return _list

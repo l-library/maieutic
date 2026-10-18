@@ -22,3 +22,6 @@ class Conversation(Base):
         default=list,
         doc="每轮消息，type表示类型，content为消息内容",
     )
+
+
+# TODO: 创建时间 & 修改时间
