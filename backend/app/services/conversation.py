@@ -1,6 +1,7 @@
 """
 处理对话相关业务
 """
+import time
 
 from openai.types.chat import ChatCompletionMessageParam
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,7 +29,9 @@ async def get_list(session: AsyncSession) -> list[dict]:
         conv = await session.get(Conversation, _id)
         if not conv:
             break
-        res.append({"id": _id, "title": conv.title})
+        res.append({"id": _id, "title": conv.title,
+                    "create_time": conv.create_time,
+                    "change_time": conv.change_time})
         _id += 1
     return res
 
@@ -36,8 +39,11 @@ async def get_list(session: AsyncSession) -> list[dict]:
 async def create_conversation(title: str, session: AsyncSession) -> int:
     """
     增：创建对话，返回对话 id
+    创建时自动插入创建&修改时间
     """
-    conv = Conversation(title=title)
+    conv = Conversation(title=title,
+                        create_time=int(time.time()),
+                        change_time=int(time.time()))
     session.add(conv)
     await session.commit()
     return conv.id

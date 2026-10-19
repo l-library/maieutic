@@ -7,6 +7,9 @@
     --color-sidebar: var(--color-slate-100);
     --color-hover: var(--color-slate-200);
     --color-border: var(--color-slate-200);
+    --color-time: var(--color-slate-500);
+    --color-text: var(--color-slate-900);
+    --color-text-secondary: var(--color-slate-800);
 
     /*主题色*/
     --color-primary: ;
@@ -18,6 +21,6 @@
 }
 @layer comment {
     .menu-item {
-         @apply  flex gap-2 py-2 rounded-2xl items-center hover:bg-hover shadow shadow-border p-3
+         @apply  flex gap-2 py-2 rounded-2xl items-center hover:bg-hover shadow shadow-border p-3 text-text
      }
 }

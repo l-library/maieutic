@@ -3,9 +3,10 @@ conversation 表映射
 """
 
 from openai.types.chat import ChatCompletionMessageParam
-from sqlalchemy import JSON, String
+from sqlalchemy import JSON, String, Integer
 from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import Mapped, mapped_column
+import time
 
 from app.models.base import Base
 
@@ -22,6 +23,8 @@ class Conversation(Base):
         default=list,
         doc="每轮消息，type表示类型，content为消息内容",
     )
+    create_time: Mapped[int] = mapped_column(Integer, doc="创建时间")
+    change_time: Mapped[int] = mapped_column(Integer, doc="修改时间")
 
 
 # TODO: 创建时间 & 修改时间

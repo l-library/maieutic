@@ -310,6 +310,10 @@ export interface components {
             id: number;
             /** Title */
             title: string;
+            /** Create Time */
+            create_time: number;
+            /** Change Time */
+            change_time: number;
         } & {
             [key: string]: unknown;
         };
