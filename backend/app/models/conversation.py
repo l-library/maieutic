@@ -2,7 +2,6 @@
 conversation 表映射
 """
 
-
 from openai.types.chat import ChatCompletionMessageParam
 from sqlalchemy import JSON, Integer, String
 from sqlalchemy.ext.mutable import MutableList
