@@ -2,11 +2,11 @@
 conversation 表映射
 """
 
+
 from openai.types.chat import ChatCompletionMessageParam
-from sqlalchemy import JSON, String, Integer
+from sqlalchemy import JSON, Integer, String
 from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import Mapped, mapped_column
-import time
 
 from app.models.base import Base
 

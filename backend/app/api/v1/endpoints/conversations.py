@@ -39,8 +39,8 @@ class ModelResponse(BaseModel):
 class ConversationElement(BaseModel):
     id: int
     title: str
-    create_time : int
-    change_time : int
+    create_time: int
+    change_time: int
 
 
 @router.get("/")
