@@ -24,6 +24,3 @@ class Conversation(Base):
     )
     create_time: Mapped[int] = mapped_column(Integer, doc="创建时间")
     change_time: Mapped[int] = mapped_column(Integer, doc="修改时间")
-
-
-# TODO: 创建时间 & 修改时间

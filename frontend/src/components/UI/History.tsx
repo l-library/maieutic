@@ -25,13 +25,12 @@ const History = () => {
     if (error) return <div className={"text-red-500"}>{error}</div>
     const padding_distance = '3';
     return (
-        // TODO: Conversation 时间字段 自动命名
         <ul className='flex flex-col h-full w-full overflow-x-auto'>
             {conversations.map((m) =>
                 <li key={m.id}>
                     <Link to='#' className={'flex gap-2 py-2 rounded items-center hover:bg-hover border border-border text-text-secondary p-'+padding_distance}>
                         {String(m.title)}
-                        <div className={'absolute text-time right-'+padding_distance}>
+                        <div className='text-time ml-auto'>
                             {dayjs.unix(m.change_time).format("YYYY-M-D H:m:s")}
                         </div>
                     </Link>

@@ -10,14 +10,19 @@
     --color-time: var(--color-slate-500);
     --color-text: var(--color-slate-900);
     --color-text-secondary: var(--color-slate-800);
+    --color-bubble-a: var(--color-slate-300);
 
     /*主题色*/
-    --color-primary: ;
+    --color-bubble-u: var(--color-cyan-50);
+    --color-primary: var(--color-cyan-400);
     --color-secondary: #fea75f;
+    --color-warning: var(--color-red-500);
     /*TODO: 暗色模式*/
+
     /*布局尺寸*/
     --spacing-sidebar: 16rem;
     --spacing-bar-offset: calc(var(--spacing-sidebar) + 1rem);
+    --spacing-bubble-min: 60rem;
 }
 @layer comment {
     .menu-item {
