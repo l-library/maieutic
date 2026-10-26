@@ -9,13 +9,14 @@
     --color-border: var(--color-slate-200);
     --color-time: var(--color-slate-500);
     --color-text: var(--color-slate-900);
-    --color-text-secondary: var(--color-slate-800);
+    --color-text-secondary: var(--color-slate-700);
     --color-bubble-a: var(--color-slate-300);
+    --color-bubble-t: var(--color-slate-400);
 
     /*主题色*/
     --color-bubble-u: var(--color-cyan-50);
     --color-primary: var(--color-cyan-400);
-    --color-secondary: #fea75f;
+    --color-secondary: var(--color-cyan-200);
     --color-warning: var(--color-red-500);
     /*TODO: 暗色模式*/
 

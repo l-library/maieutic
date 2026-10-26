@@ -1,8 +1,13 @@
 import {conversationAPI} from "@/api/conversation.ts";
-import {useEffect, useState} from "react";
+import {Fragment, useEffect, useState} from "react";
 import {Bubble} from "@/components/UI/Bubble.tsx";
 
-type Message = { role: string, content: string }
+type ToolCall = {
+    id: string;
+    type: string;
+    function: { name: string; arguments: string };
+};
+type Message = { role: string, content: string, tool_calls?: ToolCall[], tool_call_id?: string } // tool_calls 可能存在
 export const Chat = ({conversation_id}: { conversation_id: number }) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -16,15 +21,37 @@ export const Chat = ({conversation_id}: { conversation_id: number }) => {
         return () => {
             cancelled = true;
         };
-    }, [conversation_id]); // 先用常数占位
+    }, [conversation_id]);
+    const tool_id_res = new Map<String, String>();
+    for (let m of messages) {
+        if (m.tool_call_id) // 如果是某次 tool call 的结果
+            tool_id_res.set(m.tool_call_id, m.content);
+    }
     if (error) return <div className="text-red-600">{error}</div>;
     return (
         <ol className='flex flex-col h-full w-full overflow-y-auto list-none pl-0 m-0 px-4 py-3 gap-3'>
             {
-                messages.map((m, i) =>
-                    <li key={i} className='min-w-0'>
-                        <Bubble role={m.role} content={m.content}/>
-                    </li>
+                messages.map((m, i) => {
+                        if (m.tool_call_id) // 工具调用结果不再单独占用一个气泡
+                            return (<div key={i}></div>);
+                        return (
+                            <Fragment key={i}>
+                                <li className='min-w-0'>
+                                    {<Bubble role={m.role} content={m.content}/>}
+                                </li>
+                                {
+                                    m.tool_calls?.map((tc) => (
+                                            <li key={tc.id} className="min-w-0">
+                                                <Bubble role="tool_calls"
+                                                        content={tc.function.name}
+                                                        append_inf={`arguments:\n${tc.function.arguments}\nresult:\n${tool_id_res.get(tc.id)}`}
+                                                />
+                                            </li>
+                                        )
+                                    )}
+                            </Fragment>
+                        )
+                    }
                 )
             }
         </ol>
