@@ -96,7 +96,6 @@ async def core_loop(
             # 工具调用
             tool_calls = delta.tool_calls
             if tool_calls:
-                yield {"type": "tool_calls", "content": tool_calls}
                 for tc in tool_calls or []:
                     acc = tool_calls_acc.setdefault(
                         tc.index, {"id": "", "name": "", "arguments": ""}
@@ -132,6 +131,7 @@ async def core_loop(
                 name = slot["name"].lower()
                 args = json.loads(slot["arguments"]) if slot["arguments"] else {}
                 logger.info(f"tool_call: {name}, {args}")
+                yield {"type": "tool_calls", "content": f"{name}({args})"}
                 try:
                     tool_res = tools.REGISTER[name](**args)
                     logger.info(f"tool_res:{tool_res}")
@@ -142,6 +142,7 @@ async def core_loop(
                             "tool_call_id": slot["id"],
                         }
                     )
+                    yield {"type": "tool", "content": tool_res}
                 except tools.Interrupt:
                     logger.info(f"Waiting for user input, id: {slot['id']}")
                     flag = False
