@@ -1,21 +1,17 @@
-import {useState} from "react";
 import * as PI from "react-icons/pi"
-import * as HI from "react-icons/hi2"
 import {Link} from "react-router-dom";
 import History from "@/components/UI/History.tsx";
 import {useConversationRefresh} from "@/context/conversationRefresh";
+import type {components} from "@/api/types.ts";
 
-const SideBar = () => {
-    const [sidebar, set_sidebar] = useState(false)
+type ConversationElement = components["schemas"]["ConversationElement"]
+
+const SideBar = ({open, conversation_list}: { open: boolean, conversation_list: ConversationElement[] }) => {
     const {refresh} = useConversationRefresh();
 
-    const change_sidebar = () => {
-        set_sidebar(!sidebar)
-    }
-
     return (
-        <div className={'border-r-2 border-border fixed h-full top-0 left-0 z-20 transition-transform duration-300 ' +
-            (sidebar ? 'translate-x-0' : '-translate-x-sidebar')}>
+        <div className={'flex-none overflow-hidden transition-all duration-300 ' +
+            (open ? 'w-sidebar' : 'w-0')}>
             {/* 侧边栏本体：高度整个屏幕 */}
             <nav className={'h-full w-sidebar p-1.5 bg-sidebar flex flex-col'}>
                 <img src="/maieutic.png" alt="maieutic"/>
@@ -33,16 +29,9 @@ const SideBar = () => {
                         </Link>
                     </li>
                     <hr className={"text-border"}/>
-                    <li className="flex-1 min-h-0 overflow-hidden"><History/></li>
+                    <li className="flex-1 min-h-0 overflow-hidden"><History conversations={conversation_list}/></li>
                 </ul>
             </nav>
-            {/* 汉堡按钮：到顶端4刻度（16像素） 到左边68刻度 z轴位于20 圆角 字体大小xl hover时变色*/}
-            <button
-                className="absolute top-4 left-bar-offset z-20 rounded p-2 text-xl hover:bg-hover"
-                onClick={change_sidebar}
-            >
-                {sidebar ? <PI.PiSidebar/> : <HI.HiBars3/>}
-            </button>
         </div>
     )
 }

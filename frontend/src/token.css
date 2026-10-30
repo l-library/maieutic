@@ -7,6 +7,7 @@
     --color-sidebar: var(--color-slate-100);
     --color-hover: var(--color-slate-200);
     --color-border: var(--color-slate-200);
+    --color-highlight: var(--color-slate-300);
     --color-time: var(--color-slate-500);
     --color-text: var(--color-slate-900);
     --color-text-secondary: var(--color-slate-700);
@@ -24,6 +25,10 @@
     --spacing-sidebar: 16rem;
     --spacing-bar-offset: calc(var(--spacing-sidebar) + 1rem);
     --spacing-bubble-min: 60rem;
+
+    /*各组件z轴*/
+    --z-index-sidebar: 20;
+    --z-index-header: 19
 }
 @layer comment {
     .menu-item {
