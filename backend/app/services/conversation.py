@@ -4,7 +4,9 @@
 
 import time
 
+from loguru import logger
 from openai.types.chat import ChatCompletionMessageParam
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.conversation import Conversation
@@ -24,21 +26,23 @@ async def get_conversation(
 
 async def get_list(session: AsyncSession) -> list[dict]:
     """查：查询 conversation list"""
+    stmt = select(
+        Conversation.id,
+        Conversation.title,
+        Conversation.create_time,
+        Conversation.change_time,
+    )
+    result = await session.execute(stmt)
     res: list[dict] = []
-    _id = 1
-    while True:
-        conv = await session.get(Conversation, _id)
-        if not conv:
-            break
+    for conv in result:
         res.append(
             {
-                "id": _id,
+                "id": conv.id,
                 "title": conv.title,
                 "create_time": conv.create_time,
                 "change_time": conv.change_time,
             }
         )
-        _id += 1
     return res
 
 
@@ -47,9 +51,19 @@ async def create_conversation(title: str, session: AsyncSession) -> int:
     增：创建对话，返回对话 id
     创建时自动插入创建&修改时间
     """
-    conv = Conversation(
-        title=title, create_time=int(time.time()), change_time=int(time.time())
+    # 如果最近一次更新的对话为空对话，则不创建新对话
+    statement = (
+        select(Conversation.id, Conversation.messages)
+        .order_by(Conversation.create_time.desc(), Conversation.id.desc())
+        .limit(1)
     )
+    latest = (await session.execute(statement)).first()
+    if latest is not None and not latest.messages:
+        logger.info("最新对话为空，复用……")
+        return latest.id
+
+    now = int(time.time())
+    conv = Conversation(title=title, create_time=now, change_time=now)
     session.add(conv)
     await session.commit()
     return conv.id

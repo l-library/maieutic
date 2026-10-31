@@ -11,7 +11,10 @@ export const Header =
         on_click: () => void,
         conversation_list: ConversationElement[]
     }) => {
-        const {id} = useConversationIdContext()
+        // 对话名称的刷新
+        const {id} = useConversationIdContext();
+        const conv_name = conversation_list.find(c => c.id === id)?.title || `${id}`
+
         return (
             // none 固定宽高
             <div className="flex-none bg-white flex w-full h-15 border-b border-b-border items-center p-2">
@@ -22,7 +25,7 @@ export const Header =
                     {bar_open ? <PI.PiSidebar/> : <HI.HiBars3/>}
                 </button>
                 <div className="flex items-center text-xl p-2">
-                    {conversation_list.at(id-1) != null ? (conversation_list[id-1] as ConversationElement).title : id}
+                    {conv_name}
                 </div>
             </div>
         )

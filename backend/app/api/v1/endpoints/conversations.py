@@ -58,8 +58,9 @@ async def get_conversation(
     """
     利用 conversation id 获取对话
     """
-    conv = await conversation_service.get_conversation(session, conversation_id)
-    if conv is None:
+    try:
+        conv = await conversation_service.get_conversation(session, conversation_id)
+    except ValueError:
         raise HTTPException(404, detail="对话不存在")
     return conv
 
@@ -93,7 +94,7 @@ async def create_conversation(session: Annotated[AsyncSession, Depends(get_db)])
     """
     创建对话，返回对话id
     """
-    _id = await conversation_service.create_conversation("test", session)
+    _id = await conversation_service.create_conversation("新对话", session)
     return _id
 
 

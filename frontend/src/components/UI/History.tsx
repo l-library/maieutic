@@ -9,21 +9,24 @@ const History = ({conversations}: { conversations: ConversationElement[] }) => {
     const padding_distance = '3';
     return (
         <ul className='flex flex-col h-full w-full overflow-x-auto'>
-            {conversations.map((m) =>
-                <li key={m.id}>
-                    <div
-                        className={(m.id === id ? "bg-highlight " : "") +
-                            'flex gap-2 py-2 rounded items-center hover:bg-hover cursor-pointer border border-border text-text-secondary p-' + padding_distance}
-                        onClick={() => {
-                            changeId(m.id)
-                        }}>
-                        {String(m.title)}
-                        <div className='text-time ml-auto'>
-                            {dayjs.unix(m.change_time).format("YYYY-M-D H:m:s")}
+            {// 按更改时间排序
+                conversations.sort(
+                    (a, b) =>
+                        b.change_time - a.change_time).map((m) =>
+                    <li key={m.id}>
+                        <div
+                            className={(m.id === id ? "bg-highlight " : "") +
+                                'flex gap-2 py-2 rounded items-center hover:bg-hover cursor-pointer border border-border text-text-secondary p-' + padding_distance}
+                            onClick={() => {
+                                changeId(m.id)
+                            }}>
+                            {String(m.title)}
+                            <div className='text-time ml-auto'>
+                                {dayjs.unix(m.change_time).format("YYYY-MM-DD HH:mm:s")}
+                            </div>
                         </div>
-                    </div>
-                </li>
-            )}
+                    </li>
+                )}
         </ul>
     )
         ;

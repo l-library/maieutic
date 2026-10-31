@@ -80,12 +80,18 @@ def test_chat_persists_messages(client):
 
 
 def test_conversations_are_isolated(client):
-    """不同对话各自维护历史"""
+    """不同对话各自维护历史；最近一条空对话会被复用"""
     first = client.get("/api/v1/conversation/create").json()
-    second = client.get("/api/v1/conversation/create").json()
-    assert first != second
+
+    # 最近对话仍为空，再次创建复用同一条
+    assert client.get("/api/v1/conversation/create").json() == first
 
     client.post(f"/api/v1/conversation/chat/{first}", json={"message": "TEST"})
+
+    # 最近对话已有消息，新建一条
+    second = client.get("/api/v1/conversation/create").json()
+    assert second != first
+    assert client.get(f"/api/v1/conversation/get/{second}").json() == []
 
     assert [
         m["role"] for m in client.get(f"/api/v1/conversation/get/{first}").json()
@@ -95,4 +101,3 @@ def test_conversations_are_isolated(client):
         "tool",
         "assistant",
     ]
-    assert client.get(f"/api/v1/conversation/get/{second}").json() == []

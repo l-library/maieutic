@@ -111,7 +111,7 @@ async def core_loop(
             "role": "assistant",
             "content": "".join(content_parts) or None,
         }  # 一条新消息
-        logger.info(f"Assistant message: \n------{new_message}\n------")
+        logger.info(f"Assistant message: \n{new_message}\n")
         # 是否有工具调用
         if tool_calls_acc:
             # 先构建完整消息
