@@ -51,6 +51,12 @@ class FakeLLM(LLMClient):
             choices=[Choice(index=index, delta=delta, finish_reason=finish_reason)],
         )
 
+    def generate(self, prompt: str, timeout: float = 60, max_tokens: int = 1000):
+        """
+        结构和 llm 相同，模拟非流式返回 (content, reasoning_content)
+        """
+        return "fake title", None
+
     async def generate_stream(
         self,
         prompt: list[ChatCompletionMessageParam],

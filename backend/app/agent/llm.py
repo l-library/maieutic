@@ -26,6 +26,7 @@ class LLMClient(Protocol):
         timeout: float = 120,
         max_tokens: int = 3000,
     ) -> AsyncIterable[ChatCompletionChunk]: ...
+    def generate(self, prompt: str, timeout: float = 60, max_tokens: int = 1000): ...
 
 
 class LLM(LLMClient):

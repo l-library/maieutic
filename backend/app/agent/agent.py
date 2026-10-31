@@ -18,6 +18,7 @@ from app.agent.llm import LLMClient
 from app.agent.prompt import Prompt
 from app.services import conversation as conversation_db
 
+
 async def core_loop(
     history: list[ChatCompletionMessageParam],
     user_message: str,
