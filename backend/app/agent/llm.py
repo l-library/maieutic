@@ -77,7 +77,7 @@ class LLM(LLMClient):
         if not content:
             # 如果content为空，则直接回退到 reasoning_content
             content = reasoning_content or ""
-        return content, reasoning_content
+        return content
 
     async def generate_stream(
         self,

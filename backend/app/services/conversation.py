@@ -2,6 +2,7 @@
 处理对话相关业务
 """
 
+import asyncio
 import time
 
 from loguru import logger
@@ -91,17 +92,20 @@ async def auto_name_conversation(session: AsyncSession, _id: int, _llm: LLM):
     if history is None or conv is None:
         raise ValueError(f"Conversation {_id} is not exists")
     if conv.title != "新对话":
-        return
+        return ""
 
-    prompt = Prompt()
-    full_prompt = prompt.get_title_generate_prompt() + str(history)
-    title, _reasoning_content = _llm.generate(full_prompt)
-
-    if not title:
-        title = "新对话"
+    try:
+        title = await asyncio.to_thread(
+            _llm.generate, Prompt().get_title_generate_prompt() + str(history)
+        )
+    except Exception as e:  # noqa: BLE001
+        logger.warning(f"对话自动命名失败，保持“新对话”：{e!s}")
+        return ""
 
     # 入库
     conv.title = title
     await session.commit()
 
     logger.info(f"对话自动命名：[{title}]")
+
+    return title

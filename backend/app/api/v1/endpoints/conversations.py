@@ -45,7 +45,7 @@ class ConversationElement(BaseModel):
 
 @router.get("/")
 def llm_alive():
-    return {"llm test": _get_llm_client().generate("hello")[0]}
+    return {"llm test": _get_llm_client().generate("hello")}
 
 
 @router.get(
@@ -87,9 +87,10 @@ async def llm_chat(
         conversation_id=conversation_id,
     ):
         yield piece
-    await conversation_service.auto_name_conversation(
+    title = await conversation_service.auto_name_conversation(
         session, conversation_id, _get_llm_client()
     )
+    yield {"type": "title", "content": title}
 
 
 @router.get("/conversation/create")

@@ -72,7 +72,7 @@ def test_chat_persists_messages(client):
         if line.startswith("data: ")
     ]
     assert any(e["type"] == "tool_calls" for e in events)
-    assert events[-1]["type"] == "assistant"
+    assert events[-1]["type"] in ("assistant", "title")
 
     response = client.get(f"/api/v1/conversation/get/{conversation_id}")
     roles = [m["role"] for m in response.json()]

@@ -4,6 +4,7 @@ import {Bubble} from "@/components/UI/Bubble.tsx";
 import {stream} from "@/api/stream"
 import type {Chunk} from "@/api/sse.ts";
 import {ChatBox} from "@/components/UI/ChatBox.tsx";
+import {useConversationRefresh} from "@/context/conversationRefresh.ts";
 
 type ToolCall = {
     id: string;
@@ -16,6 +17,7 @@ export const Chat = ({conversation_id}: { conversation_id: number }) => {
     const [error, setError] = useState<string | null>(null);
     const [streaming, set_streaming] = useState<Message | null>(null); // 正在拼的气泡
     const [pending, set_pending] = useState(false);
+    const {refresh} = useConversationRefresh();
 
     // 获取 chunk 的 roll
     const role_of = (t: Chunk["type"]) =>
@@ -37,6 +39,10 @@ export const Chat = ({conversation_id}: { conversation_id: number }) => {
         let acc: Message | null = null; // 累加器，累计流式到达的消息
         try {
             for await (const c of stream(conversation_id, {message: text})) {
+                if (c.type === "title") {
+                    refresh();
+                    continue;
+                }
                 const role = role_of(c.type);
                 // tool 的 content 可能是数组/对象（Web_Extract 返回 list）
                 const content = typeof c.content === "string" ? c.content : JSON.stringify(c.content);

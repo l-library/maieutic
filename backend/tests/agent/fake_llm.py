@@ -55,7 +55,7 @@ class FakeLLM(LLMClient):
         """
         结构和 llm 相同，模拟非流式返回 (content, reasoning_content)
         """
-        return "fake title", None
+        return "fake title"
 
     async def generate_stream(
         self,
