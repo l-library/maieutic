@@ -53,7 +53,7 @@ def llm_alive():
     response_model=list[ChatCompletionMessageParam],
 )
 async def get_conversation(
-    conversation_id: int, session: Annotated[AsyncSession, Depends(get_db)]
+        conversation_id: int, session: Annotated[AsyncSession, Depends(get_db)]
 ):
     """
     利用 conversation id 获取对话
@@ -71,22 +71,23 @@ async def get_conversation(
     response_class=EventSourceResponse,
 )
 async def llm_chat(
-    conversation_id: int,
-    message: Message,
-    session: Annotated[AsyncSession, Depends(get_db)],
+        conversation_id: int,
+        message: Message,
+        session: Annotated[AsyncSession, Depends(get_db)],
 ):
     """
     传入对话id，使用那个id的对话历史
     """
     conv = await conversation_service.get_conversation(session, conversation_id)
     async for piece in core_loop(
-        history=conv,
-        user_message=message.message,
-        llm=_get_llm_client(),
-        db_session=session,
-        conversation_id=conversation_id,
+            history=conv,
+            user_message=message.message,
+            llm=_get_llm_client(),
+            db_session=session,
+            conversation_id=conversation_id,
     ):
         yield piece
+    await conversation_service.auto_name_conversation(session, conversation_id, _get_llm_client())
 
 
 @router.get("/conversation/create")

@@ -9,11 +9,13 @@ from openai.types.chat import ChatCompletionMessageParam
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.agent.llm import LLM
+from app.agent.prompt import Prompt
 from app.models.conversation import Conversation
 
 
 async def get_conversation(
-    session: AsyncSession, _id: int
+        session: AsyncSession, _id: int
 ) -> list[ChatCompletionMessageParam]:
     """
     查：对话历史
@@ -70,7 +72,7 @@ async def create_conversation(title: str, session: AsyncSession) -> int:
 
 
 async def append_new_messages(
-    session: AsyncSession, _id: int, new_messages: list[ChatCompletionMessageParam]
+        session: AsyncSession, _id: int, new_messages: list[ChatCompletionMessageParam]
 ) -> bool:
     """增：向指定对话插入新消息"""
     conv = await session.get(Conversation, _id)
@@ -79,3 +81,29 @@ async def append_new_messages(
     conv.messages += new_messages
     await session.commit()
     return True
+
+
+async def auto_name_conversation(
+        session: AsyncSession, _id: int, _llm: LLM
+):
+    """改：为给定 id 的对话，调用 llm 重命名，llm 不可用时自动降级"""
+    history = await get_conversation(session, _id)
+    conv = await session.get(Conversation, _id)
+
+    if history is None or conv is None:
+        raise ValueError(f"Conversation {_id} is not exists")
+    if conv.title != "新对话":
+        return
+
+    prompt = Prompt()
+    full_prompt = prompt.get_title_generate_prompt() + str(history)
+    title, reasoning_content = _llm.generate(full_prompt)
+
+    if not title:
+        title = "新对话"
+
+    # 入库
+    conv.title = title
+    await session.commit()
+
+    logger.info(f"对话自动命名：[{title}]")

@@ -29,7 +29,7 @@ class Prompt:
         return self.os_env
 
     def get_sys_prompt(self) -> str:
-        path = PROMPT_DIR / "SOUL.md"
+        path = PROMPT_DIR / "prompt" / "SOUL.md"
         if not path.is_file():
             raise PromptNotFoundError(f"提示词文件不存在: {path}")
         # 获取文件的修改时间，当作参数传给_read
@@ -41,3 +41,10 @@ class Prompt:
 所在目录：'/home/liborui/Documents/workspace/'
             """
         return sys + soul
+
+    def get_title_generate_prompt(self) -> str:
+        path = PROMPT_DIR / "prompt" / "TITLE_GENERATE.md"
+        if not path.is_file():
+            raise PromptNotFoundError(f"提示词文件不存在：{path}")
+        title_generate_prompt = _read(str(path), path.stat().st_mtime).strip()
+        return title_generate_prompt

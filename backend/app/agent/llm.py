@@ -63,7 +63,7 @@ class LLM(LLMClient):
             messages=[{"role": "user", "content": prompt}],
             stream=False,
             reasoning_effort="high",
-            extra_body={"thinking": {"type": "enabled"}},
+            extra_body={"thinking": {"type": "disabled"}},
             max_tokens=max_tokens,
             timeout=timeout,
             tools=get_tool_list(),

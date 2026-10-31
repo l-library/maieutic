@@ -18,17 +18,6 @@ from app.agent.llm import LLMClient
 from app.agent.prompt import Prompt
 from app.services import conversation as conversation_db
 
-# class agent:
-#    def __init__(self, _llm: LLMClient) -> None:
-#        self.prompt = Prompt()
-#        self.messages: list[ChatCompletionMessageParam] = [
-#            {"role": "system", "content": self.prompt.get_sys_prompt()}
-#        ]
-#        self.pending: tools.Interrupt | None = None
-#        self.tool_call_id = ""
-#        self.llm = _llm
-
-
 async def core_loop(
     history: list[ChatCompletionMessageParam],
     user_message: str,
