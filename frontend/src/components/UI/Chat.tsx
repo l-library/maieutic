@@ -3,6 +3,7 @@ import {Fragment, useEffect, useState} from "react";
 import {Bubble} from "@/components/UI/Bubble.tsx";
 import {stream} from "@/api/stream"
 import type {Chunk} from "@/api/sse.ts";
+import {ChatBox} from "@/components/UI/ChatBox.tsx";
 
 type ToolCall = {
     id: string;
@@ -15,7 +16,6 @@ export const Chat = ({conversation_id}: { conversation_id: number }) => {
     const [error, setError] = useState<string | null>(null);
     const [streaming, set_streaming] = useState<Message | null>(null); // 正在拼的气泡
     const [pending, set_pending] = useState(false);
-    const [input, set_input] = useState("");
 
     // 获取 chunk 的 roll
     const role_of = (t: Chunk["type"]) =>
@@ -109,20 +109,7 @@ export const Chat = ({conversation_id}: { conversation_id: number }) => {
                     </li>
                 )/*若有流式，则给流式单独开一个气泡*/}
             </ol>
-            {/*TODO: 聊天框组件 目前先用这个占位*/}
-            <form className='flex gap-2 px-4 py-3'
-                  onSubmit={(e) => {
-                      e.preventDefault();
-                      if (!input.trim() || pending) return;
-                      const text = input;
-                      set_input("");
-                      void chat(text);
-                  }}>
-                <input className='flex-1 min-w-0 rounded-2xl border-2 border-border px-3 py-2 bg-background'
-                       value={input} onChange={(e) => set_input(e.target.value)}
-                       placeholder="输入消息…" disabled={pending}/>
-                <button className='menu-item' type="submit" disabled={pending}>发送</button>
-            </form>
+            <ChatBox send={chat} is_disabled={pending}/>
         </div>
     );
 }
