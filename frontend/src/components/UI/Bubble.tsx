@@ -1,5 +1,7 @@
 import {useState} from "react";
 import { PiCaretDown,PiCaretUp } from "react-icons/pi";
+import Markdown from "react-markdown"
+import remarkGfm from 'remark-gfm'
 
 export const Bubble = ({role, content, append_inf}: { role: string, content: string, append_inf?: string }) => {
     const [isOpen, setOpen] = useState(false);
@@ -49,8 +51,8 @@ export const Bubble = ({role, content, append_inf}: { role: string, content: str
     }
 
     return (
-        <div className={bubble_style + append_bubble_style}>
-            {content}
+        <div className={bubble_style + append_bubble_style + " tracking-wide"}>
+            <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
         </div>
     )
 }
