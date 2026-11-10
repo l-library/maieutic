@@ -15,7 +15,6 @@ const Day = {
 type Day = (typeof Day)[keyof typeof Day];
 
 const History = ({conversations}: { conversations: ConversationElement[] }) => {
-    // TODO: 默认最新对话
     const {id, changeId} = useConversationIdContext();
     const padding_distance = '3';
 
