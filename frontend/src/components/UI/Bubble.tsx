@@ -31,7 +31,7 @@ export const Bubble = ({role, content, append_inf}: { role: string, content: str
 
     if (role == "tool_calls") {
         return (
-            <div className={bubble_style + append_bubble_style}>
+            <div className={bubble_style + append_bubble_style + " tracking-wide"}>
                 <div className='text-text-secondary text-xl rounded p-1 flex w-full font-bold'
                      onClick={changeOpen}>
                     <div className='self-center text-primary'>
@@ -51,7 +51,7 @@ export const Bubble = ({role, content, append_inf}: { role: string, content: str
     }
 
     return (
-        <div className={bubble_style + append_bubble_style + " tracking-wide"}>
+        <div className={bubble_style + append_bubble_style + " prose prose-slate max-w-none"}>
             <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
         </div>
     )
