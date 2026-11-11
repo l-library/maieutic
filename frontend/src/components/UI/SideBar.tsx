@@ -39,7 +39,7 @@ const SideBar = ({open, conversation_list}: { open: boolean, conversation_list: 
                         </div>
                     </li>
                     <li>
-                        <Link to='#' className={"menu-item"}>
+                        <Link to='/history' className={"menu-item"}>
                             <PI.PiChat/>
                             全部对话
                         </Link>

@@ -10,13 +10,18 @@ const withSuspense = (Component: React.ComponentType) => (
 );
 
 // 路由懒加载
-const home = lazy(()=>import('./routes/home'))
+const home = lazy(() => import('./routes/home'))
+const history = lazy(() => import('./routes/history'))
 
 // 创建路由
 const router = createBrowserRouter([
     {
         path: '/',
         element: withSuspense(home)
+    },
+    {
+        path: '/history',
+        element: withSuspense(history)
     }
 ])
 

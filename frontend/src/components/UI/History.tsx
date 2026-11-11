@@ -1,6 +1,7 @@
 import type {components} from "@/api/types"
 import dayjs from "dayjs";
 import {useConversationIdContext} from "@/context/currentConversation.ts";
+import {useState} from "react";
 
 type ConversationElement = components["schemas"]["ConversationElement"]
 
@@ -14,13 +15,14 @@ const Day = {
 
 type Day = (typeof Day)[keyof typeof Day];
 
-const History = ({conversations}: { conversations: ConversationElement[] }) => {
+const History = ({conversations,in_single_page=false}: { conversations: ConversationElement[] ,in_single_page?:boolean}) => {
+    const [now_time] = useState(()=>new Date());
     const {id, changeId} = useConversationIdContext();
     const padding_distance = '3';
 
     const groupTime = (time: number): Day => {
         // 如果是在24小时以内
-        const current_time = dayjs(new Date());
+        const current_time = dayjs(now_time);
         const conv_time = dayjs.unix(time);
         if (current_time.isSame(conv_time, "day"))
             return Day.today;
@@ -34,6 +36,8 @@ const History = ({conversations}: { conversations: ConversationElement[] }) => {
     }
 
     const getFormatedTime = (time: number) => {
+        if(in_single_page)
+            return dayjs.unix(time).format("YYYY-MM-DD | HH:mm:ss");
         const group = groupTime(time);
         switch (group) {
             case Day.today:
