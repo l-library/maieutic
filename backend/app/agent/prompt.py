@@ -6,6 +6,8 @@ import platform
 from functools import lru_cache
 from pathlib import Path
 
+from app.agent.skills import get_skills_prompt
+
 PROMPT_DIR = Path(__file__).resolve().parent
 
 
@@ -40,7 +42,11 @@ class Prompt:
 操作系统：{self.os_env}
 所在目录：'/home/liborui/Documents/workspace/'
             """
-        return sys + soul
+        skill = f"""
+# 可用 skill，按需使用 read tool 读取
+{get_skills_prompt()}
+"""
+        return sys + soul + skill
 
     def get_title_generate_prompt(self) -> str:
         path = PROMPT_DIR / "prompt" / "TITLE_GENERATE.md"

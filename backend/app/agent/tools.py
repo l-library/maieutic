@@ -2,8 +2,10 @@
 提供给 agent 的可调用工具
 """
 
+import subprocess
 from collections.abc import Callable
 from os import getenv
+from pathlib import Path
 
 from dotenv import load_dotenv
 from openai import BaseModel, pydantic_function_tool
@@ -72,6 +74,24 @@ class Web_Extract(BaseModel):
     urls: list[str]
 
 
+@tool
+class Read(BaseModel):
+    """
+    阅读指定文件的内容
+    """
+
+    path: str
+
+
+@tool
+class Bash(BaseModel):
+    """
+    执行 Bash 命令
+    """
+
+    command: str
+
+
 def get_tool_list():
     """
     获取 openai 格式工具列表
@@ -103,3 +123,28 @@ def web_extract(urls: list) -> str:
     """
     response = _get_tavily_client().extract(urls=urls, include_images=False)
     return response["results"]
+
+
+@fun
+def read(path: str) -> str:
+    """
+    阅读指定文件的内容
+    """
+    _path = Path(path)
+    if _path.is_file():
+        with _path.open(encoding="utf-8-sig") as f:
+            content = f.read()
+        return content
+    else:
+        raise OSError(f"Path '{path}' is not a file")
+
+
+@fun
+def bash(command: str) -> str:
+    """
+    执行 Bash 命令
+    """
+
+    res = subprocess.getstatusoutput(command)
+
+    return f"Return_code:{res[0]}\nstdout:{res[1]}"
