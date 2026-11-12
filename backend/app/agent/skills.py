@@ -24,7 +24,7 @@ def _yaml_to_dict(y):
     """递归解析 yaml 为 dict"""
     for i, j in y.items():
         if isinstance(j, dict):
-            _yaml_to_dict(j)
+            yield from _yaml_to_dict(j)
         else:
             yield i, j
 
@@ -36,7 +36,12 @@ def get_skills_prompt():
     for skill_file in path.rglob("SKILL.md"):
         if skill_file.is_file():
             front_matter = _read_front_matter(skill_file)
-            fm_yaml = yaml.safe_load(front_matter)
+            try:
+                fm_yaml = yaml.safe_load(front_matter)
+            except yaml.YAMLError:
+                continue  # yaml 写坏了，跳过这个 skill
+            if not isinstance(fm_yaml, dict):  # 无 front matter 或格式不对，跳过
+                continue
             name = None
             for key, value in _yaml_to_dict(fm_yaml):
                 if key == "name":

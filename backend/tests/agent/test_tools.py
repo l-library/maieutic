@@ -82,6 +82,57 @@ def test_client_is_lazy_singleton(monkeypatch):
         assert ctor.call_args.kwargs == {"api_key": "test-key"}
 
 
+# read / bash 行为测试，只操作临时目录，不依赖外部环境
+
+
+def test_read_returns_file_content(tmp_path):
+    f = tmp_path / "a.txt"
+    f.write_text("hello", encoding="utf-8")
+    assert REGISTER["read"](path=str(f)) == "hello"
+
+
+def test_read_keeps_multiline_content(tmp_path):
+    f = tmp_path / "a.txt"
+    f.write_text("line1\nline2\n", encoding="utf-8")
+    assert REGISTER["read"](path=str(f)) == "line1\nline2\n"
+
+
+def test_read_strips_bom(tmp_path):
+    f = tmp_path / "bom.txt"
+    f.write_text("hi", encoding="utf-8-sig")
+    assert REGISTER["read"](path=str(f)) == "hi"
+
+
+def test_read_accepts_chinese_content(tmp_path):
+    f = tmp_path / "zh.md"
+    f.write_text("你好，世界", encoding="utf-8")
+    assert REGISTER["read"](path=str(f)) == "你好，世界"
+
+
+def test_read_missing_file_raises(tmp_path):
+    with pytest.raises(OSError, match="is not a file"):
+        REGISTER["read"](path=str(tmp_path / "nope.txt"))
+
+
+def test_read_directory_raises(tmp_path):
+    with pytest.raises(OSError, match="is not a file"):
+        REGISTER["read"](path=str(tmp_path))
+
+
+def test_bash_success():
+    assert REGISTER["bash"](command="echo hi") == "Return_code:0\nstdout:hi"
+
+
+def test_bash_nonzero_exit_keeps_code():
+    assert REGISTER["bash"](command="exit 3") == "Return_code:3\nstdout:"
+
+
+def test_bash_captures_stderr():
+    """getstatusoutput 把 stderr 并进 stdout，模型需要看得到报错"""
+    out = REGISTER["bash"](command="echo oops >&2; exit 1")
+    assert out == "Return_code:1\nstdout:oops"
+
+
 # 冒烟测试（默认跳过）
 
 LIVE_CASES = [
