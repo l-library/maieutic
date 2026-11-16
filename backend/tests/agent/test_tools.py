@@ -133,6 +133,104 @@ def test_bash_captures_stderr():
     assert out == "Return_code:1\nstdout:oops"
 
 
+# edit 行为测试，只操作临时目录
+
+
+def test_edit_replaces_text(tmp_path):
+    f = tmp_path / "a.txt"
+    f.write_text("hello world", encoding="utf-8")
+    assert REGISTER["edit"](path=str(f), old_text="world", new_text="there") == (
+        "Write succeed"
+    )
+    assert f.read_text(encoding="utf-8") == "hello there"
+
+
+def test_edit_multiline_replacement(tmp_path):
+    f = tmp_path / "a.txt"
+    f.write_text("line1\nline2\nline3\n", encoding="utf-8")
+    REGISTER["edit"](path=str(f), old_text="line1\nline2", new_text="new")
+    assert f.read_text(encoding="utf-8") == "new\nline3\n"
+
+
+def test_edit_can_delete_text(tmp_path):
+    f = tmp_path / "a.txt"
+    f.write_text("keep-remove", encoding="utf-8")
+    REGISTER["edit"](path=str(f), old_text="-remove", new_text="")
+    assert f.read_text(encoding="utf-8") == "keep"
+
+
+def test_edit_keeps_chinese_content(tmp_path):
+    f = tmp_path / "zh.md"
+    f.write_text("你好，世界", encoding="utf-8")
+    REGISTER["edit"](path=str(f), old_text="世界", new_text="北京")
+    assert f.read_text(encoding="utf-8") == "你好，北京"
+
+
+def test_edit_missing_file_raises(tmp_path):
+    with pytest.raises(OSError, match="is not a file"):
+        REGISTER["edit"](path=str(tmp_path / "nope.txt"), old_text="a", new_text="b")
+
+
+def test_edit_directory_raises(tmp_path):
+    with pytest.raises(OSError, match="is not a file"):
+        REGISTER["edit"](path=str(tmp_path), old_text="a", new_text="b")
+
+
+def test_edit_no_match_raises_and_keeps_file(tmp_path):
+    f = tmp_path / "a.txt"
+    f.write_text("hello", encoding="utf-8")
+    with pytest.raises(OSError, match="0 matches"):
+        REGISTER["edit"](path=str(f), old_text="absent", new_text="x")
+    assert f.read_text(encoding="utf-8") == "hello"
+
+
+def test_edit_ambiguous_match_raises_and_keeps_file(tmp_path):
+    """old_text 匹配不唯一时必须失败，不能猜改哪一处"""
+    f = tmp_path / "a.txt"
+    f.write_text("dup dup", encoding="utf-8")
+    with pytest.raises(OSError, match="2 matches"):
+        REGISTER["edit"](path=str(f), old_text="dup", new_text="x")
+    assert f.read_text(encoding="utf-8") == "dup dup"
+
+
+def test_edit_empty_old_text_rejected(tmp_path):
+    """空 old_text 的 count 等于行数+1，必然不唯一，应报错"""
+    f = tmp_path / "a.txt"
+    f.write_text("hello", encoding="utf-8")
+    with pytest.raises(OSError, match="matches"):
+        REGISTER["edit"](path=str(f), old_text="", new_text="x")
+    assert f.read_text(encoding="utf-8") == "hello"
+
+
+def test_write_dry_run_does_not_touch_file(tmp_path):
+    f = tmp_path / "a.txt"
+    f.write_text("old\n", encoding="utf-8")
+    out = REGISTER["write"](path=str(f), content="new\n", dry=True)
+    assert "- old" in out and "+ new" in out
+    assert f.read_text(encoding="utf-8") == "old\n"
+
+
+def test_write_wet_run_overwrites_file(tmp_path):
+    f = tmp_path / "a.txt"
+    f.write_text("old\n", encoding="utf-8")
+    assert REGISTER["write"](path=str(f), content="new\n", dry=False) == (
+        "Write succeed"
+    )
+    assert f.read_text(encoding="utf-8") == "new\n"
+
+
+def test_write_creates_missing_file(tmp_path):
+    f = tmp_path / "new" / "a.txt"
+    f.parent.mkdir()
+    REGISTER["write"](path=str(f), content="hi", dry=False)
+    assert f.read_text(encoding="utf-8") == "hi"
+
+
+def test_write_rejects_non_file_path(tmp_path):
+    with pytest.raises(OSError, match="is not a file"):
+        REGISTER["write"](path=str(tmp_path), content="x")
+
+
 # 冒烟测试（默认跳过）
 
 LIVE_CASES = [

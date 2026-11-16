@@ -47,5 +47,5 @@ def get_skills_prompt():
                 if key == "name":
                     name = value
                 elif key == "description" and name is not None:
-                    prompt += f"<skill><name>{name}</name><description>{value}</description><location>{skill_file.parent}</location></skill>"
+                    prompt += f"<skill><name>{name}</name><description>{value}</description><location>{skill_file}</location></skill>"
     return prompt + "</available_skills>"

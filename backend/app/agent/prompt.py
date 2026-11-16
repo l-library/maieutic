@@ -37,6 +37,7 @@ class Prompt:
         # 获取文件的修改时间，当作参数传给_read
         # 只要不变，_read就会缓存命中，而不读文件；如果没有命中，就说明文件被修改了，自动热重载
         soul = _read(str(path), path.stat().st_mtime).strip()
+        # TODO: SOUL现在留空，后续将设置为在应用首次启动时、用户个性化配置之后、由 agent 自己写入的文件
         sys = f"""
 # 工作环境相关信息：
 操作系统：{self.os_env}

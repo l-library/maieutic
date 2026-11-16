@@ -105,7 +105,20 @@ class Write(BaseModel):
     dry: bool = True
 
 
-# TODO: edit 工具
+@tool
+class Edit(BaseModel):
+    """
+    将文件中的旧内容替换为新内容
+    参数：path 文件路径
+         old_text 旧内容
+         new_text 新内容
+    细节：对于不存在的文件，操作失败
+         如果 old_text 匹配不唯一或是匹配失败，操作失败
+    """
+
+    path: str
+    old_text: str
+    new_text: str
 
 
 # TODO: 默认在 cwd 下执行
@@ -204,3 +217,28 @@ def bash(command: str) -> str:
     res = subprocess.getstatusoutput(command)
 
     return f"Return_code:{res[0]}\nstdout:{res[1]}"
+
+
+@fun
+def edit(path: str, old_text: str, new_text: str):
+    """
+    将文件中的旧内容替换为新内容
+    参数：path 文件路径
+         old_text 旧内容
+         new_text 新内容
+    细节：对于不存在的文件，操作失败
+         如果 old_text 匹配不唯一或是匹配失败，操作失败
+    """
+    _path = Path(path)
+    if _path.is_file():
+        with _path.open("r", encoding="utf-8") as f:
+            _old_content = str(f.read())
+            _match_count = _old_content.count(old_text)
+            if _match_count != 1:
+                raise OSError(
+                    f"Edit failed. there are {_match_count} matches in the file"
+                )
+        with _path.open("w", encoding="utf-8") as f:
+            f.write(_old_content.replace(old_text, new_text))
+            return "Write succeed"
+    raise OSError(f"Path '{path}' is not a file")

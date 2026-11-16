@@ -65,7 +65,7 @@ def test_skill_name_description_and_location(skill_dir):
     out = skills.get_skills_prompt()
     assert "<name>demo</name>" in out
     assert "<description>a demo skill</description>" in out
-    assert f"<location>{d}</location>" in out
+    assert f"<location>{d / 'SKILL.md'}</location>" in out
     assert out.startswith("<available_skills>") and out.endswith("</available_skills>")
 
 
