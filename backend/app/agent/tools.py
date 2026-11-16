@@ -1,12 +1,13 @@
 """
 提供给 agent 的可调用工具
 """
-
+import difflib
 import subprocess
 from collections.abc import Callable
 from os import getenv
 from pathlib import Path
 
+import itertools
 from dotenv import load_dotenv
 from openai import BaseModel, pydantic_function_tool
 from tavily import TavilyClient
@@ -78,11 +79,32 @@ class Web_Extract(BaseModel):
 class Read(BaseModel):
     """
     阅读指定文件的内容
+    默认读取前 100 行，可以通过修改 begin 和 end 来阅读指定行（闭区间，从1开始）
     """
 
     path: str
+    begin: int
+    end: int
 
 
+@tool
+class Write(BaseModel):
+    """
+    在文件中写入内容
+    参数：path 文件路径
+         content 写入的内容
+         dry 默认为 True，为 True 时表示 dry run ，只查看 diff 而不执行；为 False 时为 wet run ，表示真正执行
+         所有 write 操作必须在 dry 演练之后才能 wet run
+    细节：对于不存在的文件，创建文件并写入内容
+         对于存在的文件，用新内容覆盖原内容
+    """
+    path: str
+    content: str
+    dry: bool
+
+# TODO: edit 工具
+
+# TODO: 默认在 cwd 下执行
 @tool
 class Bash(BaseModel):
     """
@@ -126,17 +148,44 @@ def web_extract(urls: list) -> str:
 
 
 @fun
-def read(path: str) -> str:
+def read(path: str, begin=1, end=100) -> str:
     """
     阅读指定文件的内容
+    默认读取前 100 行，可以通过修改 begin 和 end 来阅读指定行（闭区间，从1开始）
     """
+    assert 1 <= begin <= end
     _path = Path(path)
     if _path.is_file():
-        with _path.open(encoding="utf-8-sig") as f:
-            content = f.read()
-        return content
+        with _path.open(encoding="utf-8") as f:
+            return "".join(itertools.islice(f, begin - 1, end))
     else:
         raise OSError(f"Path '{path}' is not a file")
+
+
+@fun
+def write(path: str, content: str, dry=True):
+    """
+    在文件中写入内容
+    参数：path 文件路径
+         content 写入的内容
+         dry 默认为 True，为 True 时表示 dry run ，只查看 diff 而不执行；为 False 时为 wet run ，表示真正执行
+         所有 write 操作必须在 dry 演练之后才能 wet run
+    细节：对于不存在的文件，创建文件并写入内容
+         对于存在的文件，用新内容覆盖原内容
+    """
+    _path = Path(path)
+    if _path.exists() and not _path.is_file():  # 路径存在且不是一个文件
+        raise OSError(f"Path '{path}' exists and it is not a file")
+    elif not _path.exists():  # 不存在
+        _path.touch()
+    if dry:  # dry run
+        with _path.open("r", encoding="utf-8") as f:
+            old_content = f.read()
+            return "\n".join(list(difflib.ndiff(old_content.splitlines(), content.splitlines())))
+    else:  # wet run
+        with _path.open("w", encoding="utf-8") as f:
+            f.write(content)
+            return "Write succeed"
 
 
 @fun
