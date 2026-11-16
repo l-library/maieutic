@@ -22,7 +22,7 @@ export const Bubble = ({role, content, append_inf}: { role: string, content: str
             append_bubble_style = "mx-auto bg-bubble-t w-bubble-min";
             break;
         case "assistant":
-            append_bubble_style = "mx-auto bg-background w-300";
+            append_bubble_style = "mx-auto bg-bubble-a w-300";
             break;
         default:
             append_bubble_style = "self-center bg-warning"
