@@ -1,13 +1,14 @@
 """
 提供给 agent 的可调用工具
 """
+
 import difflib
+import itertools
 import subprocess
 from collections.abc import Callable
 from os import getenv
 from pathlib import Path
 
-import itertools
 from dotenv import load_dotenv
 from openai import BaseModel, pydantic_function_tool
 from tavily import TavilyClient
@@ -83,8 +84,8 @@ class Read(BaseModel):
     """
 
     path: str
-    begin: int
-    end: int
+    begin: int = 1
+    end: int = 100
 
 
 @tool
@@ -98,11 +99,14 @@ class Write(BaseModel):
     细节：对于不存在的文件，创建文件并写入内容
          对于存在的文件，用新内容覆盖原内容
     """
+
     path: str
     content: str
-    dry: bool
+    dry: bool = True
+
 
 # TODO: edit 工具
+
 
 # TODO: 默认在 cwd 下执行
 @tool
@@ -156,7 +160,8 @@ def read(path: str, begin=1, end=100) -> str:
     assert 1 <= begin <= end
     _path = Path(path)
     if _path.is_file():
-        with _path.open(encoding="utf-8") as f:
+        # utf-8-sig：兼容带 BOM 的文件，读取时自动去掉 BOM
+        with _path.open(encoding="utf-8-sig") as f:
             return "".join(itertools.islice(f, begin - 1, end))
     else:
         raise OSError(f"Path '{path}' is not a file")
@@ -181,7 +186,9 @@ def write(path: str, content: str, dry=True):
     if dry:  # dry run
         with _path.open("r", encoding="utf-8") as f:
             old_content = f.read()
-            return "\n".join(list(difflib.ndiff(old_content.splitlines(), content.splitlines())))
+            return "\n".join(
+                list(difflib.ndiff(old_content.splitlines(), content.splitlines()))
+            )
     else:  # wet run
         with _path.open("w", encoding="utf-8") as f:
             f.write(content)
